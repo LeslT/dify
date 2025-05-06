@@ -1,0 +1,89 @@
+services:
+  # API Service
+  - type: web
+    name: dify-api
+    env: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    envVars:
+      - key: MODE
+        value: production
+      - key: SERVER_APP_API_URL
+        value: https://dify-api.onrender.com
+      - key: CONSOLE_API_URL
+        value: https://dify-api.onrender.com
+      - key: CONSOLE_WEB_URL
+        value: https://dify-web.onrender.com
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ACCESS_TOKEN_EXPIRES
+        value: 86400
+      - key: DB_USERNAME
+        fromDatabase:
+          name: dify-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: dify-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: dify-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: dify-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: dify-db
+          property: database
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: dify-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: dify-redis
+          property: port
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: dify-redis
+          property: connectionString
+      - key: STORAGE_TYPE
+        value: local
+      - key: STORAGE_LOCAL_PATH
+        value: storage
+
+  # Web Frontend Service
+  - type: web
+    name: dify-web
+    env: docker
+    dockerfilePath: ./web/Dockerfile
+    dockerContext: ./web
+    envVars:
+      - key: CONSOLE_API_URL
+        value: https://dify-api.onrender.com
+      - key: SERVER_APP_API_URL
+        value: https://dify-api.onrender.com
+
+  # PostgreSQL Database
+  - type: pserv
+    name: dify-db
+    env: docker
+    plan: free
+    disk:
+      name: data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Redis Service
+  - type: redis
+    name: dify-redis
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+    plan: free
