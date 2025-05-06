@@ -75,10 +75,7 @@ services:
     name: dify-db
     env: docker
     plan: free
-    disk:
-      name: data
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
+    # Eliminamos la configuración de disco que no es compatible con el plan gratuito
 
   # Redis Service
   - type: redis
